@@ -10,15 +10,9 @@ services:
     restart: always
     volumes:
       - .:/app
-    depends_on: 
-      - postgres
     networks:
-      - network
-
-volumes:
-  db-data:
-    driver: local
+      - manager_network
 
 networks:
-  network:
-    driver: bridge
+  manager_network:
+    external: true

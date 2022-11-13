@@ -12,5 +12,5 @@ func HandleRequests() {
 	r.GET("/alunos/:id", controllers.BuscaAlunoPorID)
 	r.DELETE("/alunos/:id", controllers.DeletaAluno)
 	r.PATCH("/alunos/:id", controllers.EditaAluno)
-	r.Run("localhost:8888")
+	r.Run()
 }

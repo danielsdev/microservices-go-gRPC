@@ -4,6 +4,7 @@ import (
 	"context"
 	"log"
 	"net/http"
+	"os"
 
 	"github.com/danielsdev/microservices-go-gRPC/api/pb"
 	"github.com/gin-gonic/gin"
@@ -20,7 +21,7 @@ var (
 
 func initGrpcConnection() {
 	if conn == nil {
-		conn, err := grpc.Dial("localhost:5555", grpc.WithTransportCredentials(insecure.NewCredentials()))
+		conn, err := grpc.Dial(os.Getenv("APP_MANAGER_IP")+":"+os.Getenv("APP_MANAGER_PORT"), grpc.WithTransportCredentials(insecure.NewCredentials()))
 
 		if err != nil {
 			log.Fatal(err)

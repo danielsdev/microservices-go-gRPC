@@ -132,7 +132,7 @@ func main() {
 
 	println("Running gRPC server")
 
-	listener, err := net.Listen("tcp", "localhost:"+os.Getenv("APP_PORT"))
+	listener, err := net.Listen("tcp", ":"+os.Getenv("APP_PORT"))
 	if err != nil {
 		panic(err)
 	}
