@@ -19,7 +19,7 @@ message StudentRequest {
 }
 
 message StudentResponse {
-    uint64  id        =    1;
+    string  id        =    1;
     string  name      =    2;
     string  cpf       =    3;
     string  rg        =    4;
@@ -27,7 +27,7 @@ message StudentResponse {
 }
 
 message EditStudentRequest {
-    uint64  id        =    1;
+    string  id        =    1;
     string  name      =    2;
     string  cpf       =    3;
     string  rg        =    4;
