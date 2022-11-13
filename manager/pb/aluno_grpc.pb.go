@@ -24,6 +24,7 @@ const _ = grpc.SupportPackageIsVersion7
 type HelloClient interface {
 	SayHello(ctx context.Context, in *HelloRequest, opts ...grpc.CallOption) (*HelloResponse, error)
 	CreateStudent(ctx context.Context, in *StudentRequest, opts ...grpc.CallOption) (*StudentResponse, error)
+	EditStudent(ctx context.Context, in *EditStudentRequest, opts ...grpc.CallOption) (*StudentResponse, error)
 	DeleteStudent(ctx context.Context, in *DeleteStudentRequest, opts ...grpc.CallOption) (*DeleteStudentResponse, error)
 	ListStudents(ctx context.Context, in *ListStudentsRequest, opts ...grpc.CallOption) (*ListStudentsResponse, error)
 	GetStudent(ctx context.Context, in *GetStudentRequest, opts ...grpc.CallOption) (*StudentResponse, error)
@@ -49,6 +50,15 @@ func (c *helloClient) SayHello(ctx context.Context, in *HelloRequest, opts ...gr
 func (c *helloClient) CreateStudent(ctx context.Context, in *StudentRequest, opts ...grpc.CallOption) (*StudentResponse, error) {
 	out := new(StudentResponse)
 	err := c.cc.Invoke(ctx, "/Hello/CreateStudent", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *helloClient) EditStudent(ctx context.Context, in *EditStudentRequest, opts ...grpc.CallOption) (*StudentResponse, error) {
+	out := new(StudentResponse)
+	err := c.cc.Invoke(ctx, "/Hello/EditStudent", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -88,6 +98,7 @@ func (c *helloClient) GetStudent(ctx context.Context, in *GetStudentRequest, opt
 type HelloServer interface {
 	SayHello(context.Context, *HelloRequest) (*HelloResponse, error)
 	CreateStudent(context.Context, *StudentRequest) (*StudentResponse, error)
+	EditStudent(context.Context, *EditStudentRequest) (*StudentResponse, error)
 	DeleteStudent(context.Context, *DeleteStudentRequest) (*DeleteStudentResponse, error)
 	ListStudents(context.Context, *ListStudentsRequest) (*ListStudentsResponse, error)
 	GetStudent(context.Context, *GetStudentRequest) (*StudentResponse, error)
@@ -103,6 +114,9 @@ func (UnimplementedHelloServer) SayHello(context.Context, *HelloRequest) (*Hello
 }
 func (UnimplementedHelloServer) CreateStudent(context.Context, *StudentRequest) (*StudentResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateStudent not implemented")
+}
+func (UnimplementedHelloServer) EditStudent(context.Context, *EditStudentRequest) (*StudentResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method EditStudent not implemented")
 }
 func (UnimplementedHelloServer) DeleteStudent(context.Context, *DeleteStudentRequest) (*DeleteStudentResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteStudent not implemented")
@@ -158,6 +172,24 @@ func _Hello_CreateStudent_Handler(srv interface{}, ctx context.Context, dec func
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(HelloServer).CreateStudent(ctx, req.(*StudentRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Hello_EditStudent_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(EditStudentRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(HelloServer).EditStudent(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/Hello/EditStudent",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(HelloServer).EditStudent(ctx, req.(*EditStudentRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -230,6 +262,10 @@ var Hello_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "CreateStudent",
 			Handler:    _Hello_CreateStudent_Handler,
+		},
+		{
+			MethodName: "EditStudent",
+			Handler:    _Hello_EditStudent_Handler,
 		},
 		{
 			MethodName: "DeleteStudent",
