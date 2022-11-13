@@ -5,6 +5,7 @@ option go_package = "./pb";
 service Hello {
     rpc SayHello (HelloRequest) returns (HelloResponse) {}
     rpc CreateStudent (StudentRequest) returns (StudentResponse) {}
+    rpc EditStudent (EditStudentRequest) returns (StudentResponse) {}
     rpc DeleteStudent (DeleteStudentRequest) returns (DeleteStudentResponse) {}
     rpc ListStudents (ListStudentsRequest) returns (ListStudentsResponse) {}
     rpc GetStudent (GetStudentRequest) returns (StudentResponse) {}
@@ -18,7 +19,15 @@ message StudentRequest {
 }
 
 message StudentResponse {
-    string  id        =    1;
+    uint64  id        =    1;
+    string  name      =    2;
+    string  cpf       =    3;
+    string  rg        =    4;
+    string  matricula =    5;
+}
+
+message EditStudentRequest {
+    uint64  id        =    1;
     string  name      =    2;
     string  cpf       =    3;
     string  rg        =    4;
@@ -26,7 +35,7 @@ message StudentResponse {
 }
 
 message GetStudentRequest {
-    string id = 1;
+    uint64 id = 1;
 }
 
 message HelloRequest {
@@ -42,11 +51,11 @@ message ListStudentsRequest {
 }
 
 message ListStudentsResponse {
-    repeated string name = 8;
+    repeated StudentResponse student = 1;
 }
 
 message DeleteStudentRequest {
-    string id = 1;
+    uint64 id = 1;
 }
 
 message DeleteStudentResponse {
