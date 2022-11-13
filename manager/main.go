@@ -18,9 +18,9 @@ func (s *Server) SayHello(ctx context.Context, in *pb.HelloRequest) (*pb.HelloRe
 	return &pb.HelloResponse{Message: "MANAGER, " + in.GetName()}, nil
 }
 
-func (s *Server) ListStudents(ctx context.Context, in *pb.ListStudentsRequest) (*pb.ListStudentsResponse, error) {
-	return &pb.ListStudentsResponse{Name: "Test"}, nil
-}
+// func (s *Server) ListStudents(ctx context.Context, in *pb.ListStudentsRequest) (*pb.ListStudentsResponse, error) {
+// 	return &pb.ListStudentsResponse{Name: "Test"}, nil
+// }
 
 func main() {
 	println("Running gRPC server")

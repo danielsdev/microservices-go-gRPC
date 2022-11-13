@@ -26,6 +26,7 @@ type HelloClient interface {
 	CreateStudent(ctx context.Context, in *StudentRequest, opts ...grpc.CallOption) (*StudentResponse, error)
 	DeleteStudent(ctx context.Context, in *DeleteStudentRequest, opts ...grpc.CallOption) (*DeleteStudentResponse, error)
 	ListStudents(ctx context.Context, in *ListStudentsRequest, opts ...grpc.CallOption) (*ListStudentsResponse, error)
+	GetStudent(ctx context.Context, in *GetStudentRequest, opts ...grpc.CallOption) (*StudentResponse, error)
 }
 
 type helloClient struct {
@@ -72,6 +73,15 @@ func (c *helloClient) ListStudents(ctx context.Context, in *ListStudentsRequest,
 	return out, nil
 }
 
+func (c *helloClient) GetStudent(ctx context.Context, in *GetStudentRequest, opts ...grpc.CallOption) (*StudentResponse, error) {
+	out := new(StudentResponse)
+	err := c.cc.Invoke(ctx, "/Hello/GetStudent", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // HelloServer is the server API for Hello service.
 // All implementations must embed UnimplementedHelloServer
 // for forward compatibility
@@ -80,6 +90,7 @@ type HelloServer interface {
 	CreateStudent(context.Context, *StudentRequest) (*StudentResponse, error)
 	DeleteStudent(context.Context, *DeleteStudentRequest) (*DeleteStudentResponse, error)
 	ListStudents(context.Context, *ListStudentsRequest) (*ListStudentsResponse, error)
+	GetStudent(context.Context, *GetStudentRequest) (*StudentResponse, error)
 	mustEmbedUnimplementedHelloServer()
 }
 
@@ -98,6 +109,9 @@ func (UnimplementedHelloServer) DeleteStudent(context.Context, *DeleteStudentReq
 }
 func (UnimplementedHelloServer) ListStudents(context.Context, *ListStudentsRequest) (*ListStudentsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ListStudents not implemented")
+}
+func (UnimplementedHelloServer) GetStudent(context.Context, *GetStudentRequest) (*StudentResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetStudent not implemented")
 }
 func (UnimplementedHelloServer) mustEmbedUnimplementedHelloServer() {}
 
@@ -184,6 +198,24 @@ func _Hello_ListStudents_Handler(srv interface{}, ctx context.Context, dec func(
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Hello_GetStudent_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetStudentRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(HelloServer).GetStudent(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/Hello/GetStudent",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(HelloServer).GetStudent(ctx, req.(*GetStudentRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Hello_ServiceDesc is the grpc.ServiceDesc for Hello service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -206,6 +238,10 @@ var Hello_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "ListStudents",
 			Handler:    _Hello_ListStudents_Handler,
+		},
+		{
+			MethodName: "GetStudent",
+			Handler:    _Hello_GetStudent_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

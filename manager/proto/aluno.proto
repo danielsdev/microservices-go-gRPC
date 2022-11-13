@@ -7,6 +7,7 @@ service Hello {
     rpc CreateStudent (StudentRequest) returns (StudentResponse) {}
     rpc DeleteStudent (DeleteStudentRequest) returns (DeleteStudentResponse) {}
     rpc ListStudents (ListStudentsRequest) returns (ListStudentsResponse) {}
+    rpc GetStudent (GetStudentRequest) returns (StudentResponse) {}
 }
 
 message StudentRequest {
@@ -22,6 +23,10 @@ message StudentResponse {
     string  cpf       =    3;
     string  rg        =    4;
     string  matricula =    5;
+}
+
+message GetStudentRequest {
+    string name = 1;
 }
 
 message HelloRequest {
