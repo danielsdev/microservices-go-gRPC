@@ -35,7 +35,7 @@ message EditStudentRequest {
 }
 
 message GetStudentRequest {
-    uint64 id = 1;
+    string id = 1;
 }
 
 message HelloRequest {
@@ -55,7 +55,7 @@ message ListStudentsResponse {
 }
 
 message DeleteStudentRequest {
-    uint64 id = 1;
+    string id = 1;
 }
 
 message DeleteStudentResponse {
