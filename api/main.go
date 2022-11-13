@@ -14,8 +14,5 @@ func main() {
 		log.Panic("Erro ao carregar env")
 	}
 
-	//database.ConectaComBancoDeDados()
-	//fixtures.GerarAlunos()
-	//fmt.Printf("%+v\n", models.Alunos)
 	routes.HandleRequests()
 }

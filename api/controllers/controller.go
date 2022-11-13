@@ -1,94 +1,160 @@
 package controllers
 
 import (
+	"context"
+	"log"
 	"net/http"
 
-	"github.com/danielsdev/microservices-go-gRPC/api/database"
-	"github.com/danielsdev/microservices-go-gRPC/api/models"
+	"github.com/danielsdev/microservices-go-gRPC/api/pb"
 	"github.com/gin-gonic/gin"
+
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 )
 
+var (
+	conn   *grpc.ClientConn
+	err    error
+	client pb.HelloClient
+)
+
+func initGrpcConnection() {
+	if conn == nil {
+		conn, err := grpc.Dial("localhost:5555", grpc.WithTransportCredentials(insecure.NewCredentials()))
+
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		client = pb.NewHelloClient(conn)
+	}
+}
+
 func ExibeTodosAlunos(c *gin.Context) {
-	var alunos []models.Aluno
-	database.DB.Find(&alunos)
-	c.JSON(200, alunos)
-	//c.JSON(200, fixtures.Alunos)
+	initGrpcConnection()
+	req := &pb.ListStudentsRequest{}
+
+	res, err := client.ListStudents(context.Background(), req)
+
+	if err != nil {
+		c.JSON(400, err)
+	}
+
+	c.JSON(200, res.GetStudent())
 }
 
 func CriaNovoAluno(c *gin.Context) {
-	var aluno models.Aluno
-	// vincula todos os dados com a struct
-	if err := c.ShouldBindJSON(&aluno); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error": err.Error(),
-		})
+	initGrpcConnection()
+
+	type Request struct {
+		Nome      string
+		Matricula string
+		Rg        string
+		Cpf       string
+		Id        string
+	}
+
+	var requestBody Request
+	if err := c.BindJSON(&requestBody); err != nil {
+		c.JSON(http.StatusBadRequest, err)
 		return
 	}
 
-	database.DB.Create(&aluno)
-	c.JSON(http.StatusOK, aluno)
+	createAluno := &pb.StudentRequest{
+		Name:      requestBody.Nome,
+		Matricula: requestBody.Matricula,
+		Rg:        requestBody.Rg,
+		Cpf:       requestBody.Cpf,
+	}
+
+	res, err := client.CreateStudent(context.Background(), createAluno)
+	if err != nil || res.Id == "0" {
+		c.JSON(http.StatusBadRequest, err)
+	}
+
+	c.JSON(http.StatusCreated, res)
 }
 
 func BuscaAlunoPorID(c *gin.Context) {
-	var aluno models.Aluno
+
+	initGrpcConnection()
+
 	id := c.Params.ByName("id")
 
-	database.DB.First(&aluno, id)
+	req := &pb.GetStudentRequest{
+		Id: id,
+	}
 
-	if aluno.ID == 0 {
+	res, err := client.GetStudent(context.Background(), req)
+
+	if err != nil {
+		c.JSON(http.StatusBadRequest, err)
+	}
+
+	if res.Id == "0" {
 		c.JSON(http.StatusNotFound, gin.H{
 			"error": "Aluno não encontrado",
 		})
 		return
 	}
-	c.JSON(http.StatusOK, aluno)
+
+	c.JSON(http.StatusOK, res)
 }
 
 func DeletaAluno(c *gin.Context) {
-	var aluno models.Aluno
+	initGrpcConnection()
+
 	id := c.Params.ByName("id")
 
-	err := database.DB.Delete(&aluno, id).Error
-	// database.DB.Delete(&aluno, id)
+	req := &pb.DeleteStudentRequest{
+		Id: id,
+	}
+
+	res, err := client.DeleteStudent(context.Background(), req)
 
 	if err != nil {
+		c.JSON(http.StatusBadRequest, err)
+	}
+
+	if res.Status == "Erro" {
 		c.JSON(http.StatusNotFound, gin.H{
 			"error": "Aluno não encontrado",
 		})
 		return
 	}
 
-	c.JSON(http.StatusNoContent, gin.H{})
+	c.JSON(http.StatusOK, gin.H{})
 }
 
 func EditaAluno(c *gin.Context) {
-	var aluno models.Aluno
-	id := c.Params.ByName("id")
-	database.DB.First(&aluno, id)
+	initGrpcConnection()
 
-	if err := c.ShouldBindJSON(&aluno); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error": err.Error(),
-		})
+	type Request struct {
+		Nome      string
+		Matricula string
+		Rg        string
+		Cpf       string
+		Id        string
+	}
+
+	var requestBody Request
+	if err := c.BindJSON(&requestBody); err != nil {
+		c.JSON(http.StatusBadRequest, err)
 		return
 	}
 
-	database.DB.Model(&aluno).UpdateColumns(aluno)
+	editAluno := &pb.EditStudentRequest{
+		Id:        c.Params.ByName("id"),
+		Name:      requestBody.Nome,
+		Matricula: requestBody.Matricula,
+		Rg:        requestBody.Rg,
+		Cpf:       requestBody.Cpf,
+	}
+
+	res, err := client.EditStudent(context.Background(), editAluno)
+	if err != nil || res.Id == "0" {
+		c.JSON(http.StatusBadRequest, err)
+	}
+
 	c.JSON(http.StatusNoContent, gin.H{})
-}
-
-func BuscaAlunoPorCPF(c *gin.Context) {
-	var aluno models.Aluno
-	cpf := c.Param("cpf")
-
-	database.DB.Where(&models.Aluno{CPF: cpf}).First(&aluno)
-
-	if aluno.ID == 0 {
-		c.JSON(http.StatusNotFound, gin.H{
-			"error": "Aluno não encontrado",
-		})
-		return
-	}
-
-	c.JSON(http.StatusOK, aluno)
 }

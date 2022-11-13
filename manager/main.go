@@ -105,13 +105,16 @@ func (s *Server) GetStudent(ctx context.Context, in *pb.GetStudentRequest) (*pb.
 
 func (s *Server) DeleteStudent(ctx context.Context, in *pb.DeleteStudentRequest) (*pb.DeleteStudentResponse, error) {
 	var aluno models.Aluno
+	var alunoExists models.Aluno
+
 	requestId := in.GetId()
+
+	database.DB.First(&alunoExists, requestId)
 
 	err := database.DB.Delete(&aluno, requestId).Error
 
 	status := "Ok"
-
-	if err != nil || requestId == "" {
+	if err != nil || requestId == "" || alunoExists.ID == 0 {
 		status = "Erro"
 	}
 

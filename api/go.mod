@@ -2,7 +2,11 @@ module github.com/danielsdev/microservices-go-gRPC/api
 
 go 1.19
 
-require gorm.io/driver/postgres v1.3.10
+require (
+	github.com/golang/protobuf v1.5.2
+	google.golang.org/grpc v1.50.1
+	gorm.io/driver/postgres v1.3.10
+)
 
 require (
 	github.com/gin-contrib/sse v0.1.0 // indirect
@@ -33,6 +37,7 @@ require (
 	golang.org/x/net v0.0.0-20220926192436-02166a98028e // indirect
 	golang.org/x/sys v0.0.0-20220926163933-8cfa568d3c25 // indirect
 	golang.org/x/text v0.3.7 // indirect
+	google.golang.org/genproto v0.0.0-20200526211855-cb27e3aa2013 // indirect
 	google.golang.org/protobuf v1.28.1 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gorm.io/gorm v1.23.10 // indirect

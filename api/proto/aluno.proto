@@ -1,0 +1,63 @@
+syntax = "proto3";
+
+option go_package = "./pb";
+
+service Hello {
+    rpc SayHello (HelloRequest) returns (HelloResponse) {}
+    rpc CreateStudent (StudentRequest) returns (StudentResponse) {}
+    rpc EditStudent (EditStudentRequest) returns (StudentResponse) {}
+    rpc DeleteStudent (DeleteStudentRequest) returns (DeleteStudentResponse) {}
+    rpc ListStudents (ListStudentsRequest) returns (ListStudentsResponse) {}
+    rpc GetStudent (GetStudentRequest) returns (StudentResponse) {}
+}
+
+message StudentRequest {
+    string  name      =    1;
+    string  cpf       =    2;
+    string  rg        =    3;
+    string  matricula =    4;
+}
+
+message StudentResponse {
+    string  id        =    1;
+    string  name      =    2;
+    string  cpf       =    3;
+    string  rg        =    4;
+    string  matricula =    5;
+}
+
+message EditStudentRequest {
+    string  id        =    1;
+    string  name      =    2;
+    string  cpf       =    3;
+    string  rg        =    4;
+    string  matricula =    5;
+}
+
+message GetStudentRequest {
+    string id = 1;
+}
+
+message HelloRequest {
+    string name = 1;
+}
+
+message HelloResponse {
+    string message = 1;
+}
+
+message ListStudentsRequest {
+    string name = 1;
+}
+
+message ListStudentsResponse {
+    repeated StudentResponse student = 1;
+}
+
+message DeleteStudentRequest {
+    string id = 1;
+}
+
+message DeleteStudentResponse {
+    string status = 1;
+}
